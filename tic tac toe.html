@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tic Tac Toe</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #282c34;
+            margin: 0;
+            color: #ffffff;
+        }
+        .status {
+            margin-bottom: 20px;
+            font-size: 2em;
+        }
+        .game-board {
+            display: grid;
+            grid-template-columns: repeat(3, 150px);
+            grid-template-rows: repeat(3, 150px);
+            gap: 10px;
+        }
+        .cell {
+            width: 150px;
+            height: 150px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #61dafb;
+            border: 2px solid #282c34;
+            font-size: 3em;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        .cell:hover {
+            background-color: #21a1f1;
+        }
+        .cell.X {
+            color: #ff7f7f;
+        }
+        .cell.O {
+            color: #7fff7f;
+        }
+        .hidden {
+            visibility: hidden;
+        }
+        .fade-in {
+            animation: fadeIn 1s;
+        }
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="status" id="status"></div>
+    <div class="game-board" id="gameBoard">
+        <div class="cell" data-cell></div>
+        <div class="cell" data-cell></div>
+        <div class="cell" data-cell></div>
+        <div class="cell" data-cell></div>
+        <div class="cell" data-cell></div>
+        <div class="cell" data-cell></div>
+        <div class="cell" data-cell></div>
+        <div class="cell" data-cell></div>
+        <div class="cell" data-cell></div>
+    </div>
+    <script>
+        const cells = document.querySelectorAll('[data-cell]');
+        const statusText = document.getElementById('status');
+        const board = document.getElementById('gameBoard');
+        const WINNING_COMBINATIONS = [
+            [0, 1, 2],
+            [3, 4, 5],
+            [6, 7, 8],
+            [0, 3, 6],
+            [1, 4, 7],
+            [2, 5, 8],
+            [0, 4, 8],
+            [2, 4, 6]
+        ];
+        let currentPlayer = 'X';
+        let gameActive = true;
+
+        function handleClick(e) {
+            const cell = e.target;
+            if (cell.textContent !== '' || !gameActive) return;
+            cell.textContent = currentPlayer;
+            cell.classList.add(currentPlayer);
+            if (checkWin(currentPlayer)) {
+                statusText.textContent = `${currentPlayer} wins!`;
+                gameActive = false;
+            } else if (isDraw()) {
+                statusText.textContent = 'Draw!';
+                gameActive = false;
+            } else {
+                currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
+                statusText.textContent = `${currentPlayer}'s turn`;
+            }
+        }
+
+        function checkWin(player) {
+            return WINNING_COMBINATIONS.some(combination => {
+                return combination.every(index => {
+                    return cells[index].textContent === player;
+                });
+            });
+        }
+
+        function isDraw() {
+            return [...cells].every(cell => {
+                return cell.textContent !== '';
+            });
+        }
+
+        function startGame() {
+            currentPlayer = 'X';
+            statusText.textContent = `${currentPlayer}'s turn`;
+            cells.forEach(cell => {
+                cell.textContent = '';
+                cell.className = 'cell fade-in';
+                cell.addEventListener('click', handleClick, { once: true });
+            });
+            gameActive = true;
+        }
+
+        startGame();
+    </script>
+</body>
+</html>
